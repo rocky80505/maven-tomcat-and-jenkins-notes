@@ -46,35 +46,40 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Clone the code') {
             steps {
-                echo 'Building...'
-                // Add your build steps here, e.g., sh 'mvn clean install'
+                
+                git credentialsId: 'git-cred', url: 'https://github.com/rocky80505/Netflix-Pipeline-Project.git'
             }
         }
-        stage('Test') {
+        
+        stage('Package the code') {
             steps {
-                echo 'Testing...'
-                // Add your test steps here, e.g., sh 'mvn test'
+                script {
+                    
+                    def mvnHome = tool name: 'maven s/w', type: 'maven'
+                    def mvnCmd = "${mvnHome}/bin/mvn"
+                    sh "${mvnCmd} clean package"
+                }
             }
         }
-        stage('Deploy') {
+        stage('Deploy the code') {
             steps {
-                echo 'Deploying...'
-                // Add your deploy steps here, e.g., sh 'scp target/*.war user@server:/path/to/deploy'
+                script {
+                    
+                    sh 'sudo cp target/NETFLIX-1.2.2.war /root/apache-tomcat-9.0.90/webapps'
+                }
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline completed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
+
+
+before third step[i.e deploy stage]  go to apache there in bin directory write sudi visdo and in this file add 
+jenkins ALL=(ALL) NOPASSWD: /bin/cp
+
+
+
 
 ------------------
 
