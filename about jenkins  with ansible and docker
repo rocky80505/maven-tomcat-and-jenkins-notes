@@ -1,0 +1,23 @@
+Full sudo access: If you want to give Jenkins full access, add the following line. Replace jenkins with the appropriate user if different.
+jenkins ALL=(ALL) NOPASSWD:ALL
+
+
+Restricted sudo access: If you want to restrict the commands that Jenkins can run, specify those commands instead. For example, to allow Jenkins to run /usr/bin/somecommand as any user without a password prompt, add:
+jenkins ALL=(ALL) NOPASSWD:/usr/bin/somecommand      [like below]
+
+
+Steps to Grant Jenkins Permissions for Docker and Ansible  To allow Jenkins to run Docker commands, you’ll need to specify the Docker executable. If Docker is installed in /usr/bin/docker, you can add the following line:
+# Allow Jenkins to run Docker commands
+jenkins ALL=(ALL) NOPASSWD:/usr/bin/docker
+
+# Allow Jenkins to run Ansible commands
+jenkins ALL=(ALL) NOPASSWD:/usr/bin/ansible
+jenkins ALL=(ALL) NOPASSWD:/usr/bin/ansible-playbook
+
+
+
+Adding Jenkins to Docker and Ansible Groups
+sudo usermod -aG docker jenkins
+sudo usermod -aG ansible jenkins
+sudo systemctl restart jenkins
+
