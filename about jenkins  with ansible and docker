@@ -21,3 +21,5 @@ sudo usermod -aG docker jenkins
 sudo usermod -aG ansible jenkins
 sudo systemctl restart jenkins
 
+[webservers]
+54.242.15.125 ansible_ssh_private_key_file=/home/ubuntu/Rocky.pem ansible_user=ubuntu   #write in inventory file here that is public ip
