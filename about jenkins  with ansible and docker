@@ -1,3 +1,22 @@
+apt install openjdk-17-jre-headless -y
+apt install git -y
+apt install maven -y
+apt install docker.io -y
+sudo systemctl start docker
+sudo apt install software-properties-common                            #installation java,git,maven,docker,ansible,andjenkins
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins -y
+sudo systemctl status jenkins
+~                                                                                                                                                                 
+~                                                                                                                                                                 
+~                                           
 Full sudo access: If you want to give Jenkins full access, add the following line. Replace jenkins with the appropriate user if different.
 jenkins ALL=(ALL) NOPASSWD:ALL
 
@@ -18,15 +37,14 @@ jenkins ALL=(ALL) NOPASSWD:/usr/bin/ansible-playbook
 
 Adding Jenkins to Docker and Ansible Groups
 sudo usermod -aG docker jenkins
-sudo usermod -aG ansible jenkins
 sudo systemctl restart jenkins
 
 [webservers]
-54.242.15.125 ansible_ssh_private_key_file=/home/ubuntu/Rocky.pem ansible_user=ubuntu   #write in inventory file here that is public ip
+54.242.15.125 ansible_ssh_private_key_file=/home/ubuntu/staragile.pem ansible_user=ubuntu   #write in inventory file here that is public ip
 
-chown jenkins:jenkins Rocky.pem #private key of worker machine
-   22  chown jenkins:jenkins inventory.ini 
-   23  chown jenkins:jenkins /home/ubuntu #path of inventory file
-   24  chmod 755 /home/ubuntu/
-   25  chmod 644 inventory.ini 
-   26  chmod 600 Rocky.pem
+chown jenkins:jenkins staragile.pem                                     #private key of worker machine
+chown jenkins:jenkins inventory.ini 
+chown jenkins:jenkins /home/ubuntu                                  #path of inventory file
+ chmod 755 /home/ubuntu/
+chmod 644 inventory.ini 
+chmod 600 staragile.pem
