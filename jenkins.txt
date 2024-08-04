@@ -1,0 +1,95 @@
+Steps to Configure SSH Access from Jenkins Master to Worker Machine
+
+
+sudo mkdir -p /var/lib/jenkins/.ssh
+   44  sudo touch /var/lib/jenkins/.ssh/known_hosts
+   45  chown -R jenkins:jenkins /var/lib/jenkins/.ssh
+   46  sudo cp /home/ubuntu/staragile.pem /var/lib/jenkins/.ssh/id_rsa
+   47  chmod 600 /var/lib/jenkins/.ssh/id_rsa 
+   48  sudo -u jenkins ssh-keyscan -H 54.90.94.245 >> /var/lib/jenkins/.ssh/known_hosts  #it is publi ip of worker machine
+
+
+1. Generate Public Key from the Private Key (if not already done)
+If you don't have the public key (staragile.pub), you can generate it from the private key (staragile.pem) on the Jenkins Master:
+
+bash
+Copy code
+ssh-keygen -y -f /home/ubuntu/staragile.pem > /home/ubuntu/staragile.pub
+
+
+
+2. Copy the Public Key to the Worker Machine
+To allow Jenkins to connect to the worker machine, you need to add the public key to the authorized_keys file on the worker machine. Follow these steps:
+
+Copy the Public Key to the Worker Machine:
+
+You can copy the public key manually or use ssh-copy-id if you can access the worker machine with a password.
+
+Manually Copy the Key:
+
+Display the Public Key on Jenkins Master:
+
+bash
+Copy code
+
+
+cat /home/ubuntu/staragile.pub
+Copy the output of this command.
+
+Log in to the Worker Machine:
+
+If you can log in with another user or method, do so:
+
+bash
+Copy code
+
+ssh ubuntu@34.228.11.87
+Append the Public Key to authorized_keys:
+
+On the worker machine:
+
+bash
+Copy code
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+echo "paste-your-public-key-here" >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+Replace "paste-your-public-key-here" with the content of staragile.pub you copied.
+
+
+3. Verify SSH Access
+On Jenkins Master, verify that Jenkins can SSH into the worker machine without requiring a password:
+
+bash
+Copy code
+ssh -i /home/ubuntu/staragile.pem ubuntu@34.228.11.87
+
+You should be able to log in without being prompted for a password. If you can, Jenkins should also be able to use this key to connect as long as Jenkins is correctly configured to use the same private key.
+
+4. Configure Jenkins
+Ensure Jenkins is configured to use the private key for SSH connections. This usually involves:
+
+Adding the SSH Key to Jenkins Credentials:
+
+In Jenkins, navigate to Manage Jenkins -> Manage Credentials and add a new SSH key credential with the private key (staragile.pem).
+
+Configuring Jenkins Jobs:
+
+Ensure your Jenkins jobs are set to use the correct credentials when executing tasks that require SSH access to the worker machine.
+
+Summary
+Generate the public key if necessary.
+Copy the public key to the authorized_keys file on the worker machine.
+Verify that SSH access works from Jenkins Master to the worker machine.
+Configure Jenkins to use the private key for SSH connections.
+Following these steps should help you resolve the SSH connection issue between Jenkins and your worker machine.
+
+sudo mkdir -p /var/lib/jenkins/.ssh
+   44  sudo touch /var/lib/jenkins/.ssh/known_hosts
+   45  chown -R jenkins:jenkins /var/lib/jenkins/.ssh
+   46  sudo cp /home/ubuntu/staragile.pem /var/lib/jenkins/.ssh/id_rsa
+   47  chmod 600 /var/lib/jenkins/.ssh/id_rsa 
+   48  sudo -u jenkins ssh-keyscan -H 54.90.94.245 >> /var/lib/jenkins/.ssh/known_hosts  #it is publi ip of worker machine
+
+
+
