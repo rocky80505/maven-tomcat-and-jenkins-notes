@@ -84,12 +84,12 @@ Verify that SSH access works from Jenkins Master to the worker machine.
 Configure Jenkins to use the private key for SSH connections.
 Following these steps should help you resolve the SSH connection issue between Jenkins and your worker machine.
 
-sudo mkdir -p /var/lib/jenkins/.ssh
-   44  sudo touch /var/lib/jenkins/.ssh/known_hosts
-   45  chown -R jenkins:jenkins /var/lib/jenkins/.ssh
-   46  sudo cp /home/ubuntu/staragile.pem /var/lib/jenkins/.ssh/id_rsa
-   47  chmod 600 /var/lib/jenkins/.ssh/id_rsa 
-   48  sudo -u jenkins ssh-keyscan -H 54.90.94.245 >> /var/lib/jenkins/.ssh/known_hosts  #it is publi ip of worker machine
 
+rate(node_cpu_seconds_total[1m])        #cpu utilaxtion
+
+node_filesystem_size_bytes - node_filesystem_free_bytes   #disk utilisation
+
+
+node_memory_MemAvailable_bytes  #memory available
 
 
