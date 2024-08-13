@@ -1,3 +1,12 @@
+
+
+https://docs.google.com/document/d/1dNt_tq36Ci12QKyHI51nRKomWoTggFSk7R-ILQuJBVg/edit   -->java project with jeenkins and dockeer
+
+https://docs.google.com/document/d/1DjEmjNwqGSPI_rZtjJNKvSHVF3-9VCnC/edit     --> proect
+
+
+https://www.youtube.com/@akshatgupta-educatingall3182/videos videos of akash training
+
 https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository  for docker compose latest version
 
 
