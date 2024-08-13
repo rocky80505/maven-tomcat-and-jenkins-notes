@@ -1,0 +1,735 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for Docker and Ansible
+        DOCKER_REGISTRY = 'rocky8055'
+        DOCKER_IMAGE = 'my-app'
+        DOCKER_TAG = 'latest'
+        ANSIBLE_PLAYBOOK = 'ansible-playbook.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Step to pull the latest code from your Git repository
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Step to build your project using Maven
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Step to build the Docker image for your application
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                // Step to push the Docker image to a Docker registry
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withDockerRegistry(credentialsId: 'dockerhub-pwd', url: 'https://index.docker.io/v1/') {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                // Step to deploy the application using Ansible
+                sh 'ansible-playbook ${ANSIBLE_PLAYBOOK}'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup actions after the pipeline run
+            cleanWs()
+            echo 'Pipeline complete'
+        }
+        success {
+            echo 'Pipeline completed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+multipleinstcne setiup
+
+
+
+
+pipeline {
+    agent none  // Use agent none to specify individual agents for each stage
+
+    environment {
+        // Environment variables for Docker and Ansible
+        DOCKER_REGISTRY = 'my-docker-registry.com'
+        DOCKER_IMAGE = 'my-app'
+        DOCKER_TAG = 'latest'
+        ANSIBLE_PLAYBOOK = 'deploy.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            agent {
+                // Run the checkout stage on the Jenkins master
+                label 'master'  
+            }
+            steps {
+                // Checkout code from Git
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            agent {
+                // Run the build stage on a Jenkins agent with the label 'build'
+                label 'build'
+            }
+            steps {
+                // Build the project with Maven
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            agent {
+                // Run Docker commands on a Jenkins agent with the label 'docker'
+                label 'docker'
+            }
+            steps {
+                // Build Docker image
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            agent {
+                // Ensure Docker commands are run on the same Jenkins agent as the previous stage
+                label 'docker'
+            }
+            steps {
+                // Log in to Docker registry and push the image
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withDockerRegistry(credentialsId: 'docker-credentials-id', url: "https://${DOCKER_REGISTRY}") {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            agent {
+                // Run Ansible commands on a Jenkins agent with the label 'ansible'
+                label 'ansible'
+            }
+            steps {
+                // Run the Ansible playbook to deploy the application
+                sh 'ansible-playbook ${ANSIBLE_PLAYBOOK}'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Perform cleanup actions after the pipeline completes
+            cleanWs()  // Clean workspace
+            echo 'Pipeline complete'
+        }
+        success {
+            echo 'Pipeline completed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for Docker and Ansible
+        DOCKER_REGISTRY = 'rocky8055'
+        DOCKER_IMAGE = 'my-app'
+        DOCKER_TAG = 'latest'
+        ANSIBLE_PLAYBOOK = 'ansible-playbook.yml'
+        ANSIBLE_SSH_USER = 'ubuntu'
+        
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Step to pull the latest code from your Git repository
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Step to build your project using Maven
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Step to build the Docker image for your application
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                // Step to push the Docker image to a Docker registry
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withDockerRegistry(credentialsId: 'dockerhub-pwd', url: 'https://index.docker.io/v1/') {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                script {
+                    // Ensure SSH credentials are set up correctly
+                    withCredentials([sshUserPrivateKey(credentialsId: 'sshkey', keyFileVariable: 'SSH_KEY')]) {
+                        sh 'ansible-playbook ${ANSIBLE_PLAYBOOK} --private-key=${SSH_KEY}'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up or notify after the pipeline completes
+            cleanWs()
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for Docker and Ansible
+        DOCKER_REGISTRY = 'rocky8055'
+        DOCKER_IMAGE = 'my-app'
+        DOCKER_TAG = 'latest'
+        ANSIBLE_PLAYBOOK = 'ansible-playbook.yml'
+        ANSIBLE_INVENTORY = '/home/ubuntu/inventory.ini'
+        ANSIBLE_SSH_USER = 'devops'
+        
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Step to pull the latest code from your Git repository
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Step to build your project using Maven
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Step to build the Docker image for your application
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                // Step to push the Docker image to a Docker registry
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withDockerRegistry(credentialsId: 'dockerhub-pwd', url: 'https://index.docker.io/v1/') {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                script {
+                    // Ensure SSH credentials are set up correctly
+                    withCredentials([sshUserPrivateKey(credentialsId: 'sshkey', keyFileVariable: 'SSH_KEY')]) {
+                       sh '''
+                        ansible-playbook ${ANSIBLE_PLAYBOOK} \
+                            --private-key=${SSH_KEY} \
+                            --inventory=${ANSIBLE_INVENTORY}
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for Docker and Ansible
+        DOCKER_REGISTRY = 'rocky8055'
+        DOCKER_IMAGE = 'my-app'
+        DOCKER_TAG = 'latest'
+        ANSIBLE_PLAYBOOK = 'ansible-playbook.yml'
+        ANSIBLE_INVENTORY = '/home/ubuntu/inventory.ini'
+        ANSIBLE_SSH_USER = 'ubuntu'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Step to pull the latest code from your Git repository
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Step to build your project using Maven
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Step to build the Docker image for your application
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                // Step to push the Docker image to a Docker registry
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withDockerRegistry(credentialsId: 'dockerhub-pwd', url: 'https://index.docker.io/v1/') {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                script {
+                    // Ensure SSH credentials are set up correctly
+                    withCredentials([sshUserPrivateKey(credentialsId: 'sshkey', keyFileVariable: 'SSH_KEY')]) {
+                        sh "ansible-playbook -i ${ANSIBLE_INVENTORY} --private-key=${SSH_KEY} ${ANSIBLE_PLAYBOOK} -vvvv"
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    def imageName = 'rocky8055/my-app:latest'
+                    sh "docker build -t ${imageName} ."
+                    withDockerRegistry(credentialsId: 'dockerhub-pwd') {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'sshkey', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                    ansible-playbook ansible-playbook.yml \
+                        --private-key=${SSH_KEY} \
+                        --inventory=/home/ubuntu/inventory.ini
+                    '''
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+
+
+
+withCredentials([string(credentialsId: 'docker', variable: 'dockerhub')]) {          #dockerhub login cred frompiplesysntax
+    // some block
+}
+
+
+#ansible integrtin by pipeline syntax
+ansiblePlaybook become: true, credentialsId: 'ansible', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml', sudoUser: null, vaultTmpPath: ''
+
+
+
+
+
+
+# use it
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                  git url: 'https://github.com/rocky80505/star-agile-banking-finance.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Run Dockerfile') {
+            steps {
+                script {
+                    sh 'docker build -t rocky8055/my-app:latest .'
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {                                    #ensure cred id and variable
+                script {
+                    withCredentials([string(credentialsId: 'docker', variable: 'dockerhub')]) {
+                        sh 'docker login -u rocky8055 -p ${dockerhub}'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                sh 'docker push rocky8055/my-app:latest'
+            }
+        }
+        stage('Ansible deployment') {
+            steps {                                   #ensure cred id and installaton names
+                ansiblePlaybook become: true, credentialsId: 'ansible', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: 'ansible-playbook.yml', sudoUser: null, vaultTmpPath: ''
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#use it
+
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for Docker and Ansible
+        DOCKER_REGISTRY = 'rocky8055'
+        DOCKER_IMAGE = 'my-app'
+        DOCKER_TAG = 'latest'
+        ANSIBLE_PLAYBOOK = 'ansible-playbook.yml'
+        ANSIBLE_INVENTORY = '/home/ubuntu/inventory.ini'
+        
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package test'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+
+        stage('Docker login and Push Docker Image') {
+            steps {
+                script {
+                    def imageName = "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    withDockerRegistry(credentialsId: 'dockerhub-pwd', url: 'https://index.docker.io/v1/') {
+                        sh "docker push ${imageName}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'sshkey', keyFileVariable: 'SSH_KEY')]) {
+                       sh '''
+                        ansible-playbook ${ANSIBLE_PLAYBOOK} \
+                            --private-key=${SSH_KEY} \
+                            --inventory=${ANSIBLE_INVENTORY}
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#playbooks
+- name: Configure Docker on EC2 Instances
+  hosts: all
+  become: yes
+  connection: ssh
+  tasks:
+
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+      tags: 
+        - update
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+      tags:
+        - docker
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+      tags:
+        - docker
+
+    - name: Deploy Docker Container
+      docker_container:
+        name: my-app
+        image: rocky8055/my-app:latest
+        state: started
+        ports:
+          - "8082:8081"
+      tags:
+        - deploy
