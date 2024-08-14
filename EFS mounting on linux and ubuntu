@@ -1,0 +1,22 @@
+for linu######
+sudo yum install -y amazon-efs-utils
+sudo mkdir efs
+(choose as per ur efs)-- sudo mount -t efs -o tls fs-0fd6f3deb344d0925:/ efs (changes based on efs created)
+(choose as per ur efs)-- sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0fd6f3deb344d0925.efs.us-east-1.amazonaws.com:/ efs (Changes as per file system)
+
+
+
+
+
+
+##### 1st install this efs utilis on ubuntu
+sudo apt-get update
+ sudo apt-get -y install git binutils rustc cargo pkg-config libssl-dev
+ git clone https://github.com/aws/efs-utils
+ cd efs-utils
+ ./build-deb.sh
+ sudo apt-get -y install ./build/amazon-efs-utils*deb
+
+then####      create efs folder #### mkdir efs
+               the in efs id --> click on attach and mount two commands on ec2
+                then change dirextory to efs and create files
